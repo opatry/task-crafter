@@ -70,6 +70,8 @@ android {
         versionName = libs.versions.tasksApp.name.get()
 
         resourceConfigurations += listOf("en", "fr")
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -185,6 +187,9 @@ dependencies {
     implementation(project(":google:oauth"))
     implementation(project(":google:tasks"))
     implementation(project(":tasks-app-shared"))
+
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
 
 aboutLibraries {
