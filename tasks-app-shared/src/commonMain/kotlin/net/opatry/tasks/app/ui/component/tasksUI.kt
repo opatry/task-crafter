@@ -97,7 +97,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -205,7 +204,7 @@ fun TaskListDetail(
         // FIXME should be driven by the NavigationRail
         floatingActionButton = {
             // FIXME hides bottom of screen
-            FloatingActionButton(onClick = { showNewTaskSheet = true }) {
+            FloatingActionButton(onClick = { showNewTaskSheet = true }, Modifier.testTag("ADD_TASK_FAB")) {
                 Icon(LucideIcons.Plus, null)
             }
         }
