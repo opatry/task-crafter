@@ -21,12 +21,12 @@
  */
 
 
+import android.content.Context
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isDialog
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -35,6 +35,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import kotlinx.coroutines.test.runTest
 import net.opatry.tasks.app.MainActivity
+import net.opatry.tasks.app.R
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -48,6 +49,9 @@ class StoreScreenshotTest {
 
     @get:Rule
     val screenshotOnFailureRule = ScreenshotOnFailureRule()
+
+    private val targetContext: Context
+        get() = InstrumentationRegistry.getInstrumentation().targetContext
 
     private fun screenshot(name: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -80,28 +84,25 @@ class StoreScreenshotTest {
 //            }
 //        }
 
-
-        composeTestRule.waitUntilAtLeastOneExists(hasText("My Tasks", substring = true, ignoreCase = true))
-//        composeTestRule.waitUntil {
-//            composeTestRule.onNodeWithText("My Tasks").isDisplayed()
+//        if (composeTestRule.onNodeWithText("Skip").isDisplayed()) {
+//            composeTestRule.onNodeWithText("Skip").performClick()
 //        }
-//        composeTestRule.waitForIdle()
-        screenshot("start")
-//        composeTestRule.onNodeWithText("Skip").performClick()
 //        composeTestRule.onNodeWithText("Add task list…").performClick()
 //        composeTestRule.onNodeWithText("Create").performClick()
+
+        screenshot("start")
+        val taskTitle = targetContext.getString(R.string.demo_task_list_default)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(taskTitle))
         screenshot("tasks_list_light")
-        val boolll = composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).isDisplayed()
-        println("boolll=$boolll")
-        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).assertExists()
-        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).assertIsDisplayed()
-        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).performClick()
+        composeTestRule.onNodeWithText(taskTitle, substring = true, ignoreCase = true)
+            .assertIsDisplayed()
+            .performClick()
         screenshot("my_tasks_light")
 
-
         composeTestRule.waitUntilExactlyOneExists(hasTestTag("ADD_TASK_FAB"))
-        composeTestRule.onNodeWithTag("ADD_TASK_FAB").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("ADD_TASK_FAB")
+            .assertIsDisplayed()
+            .performClick()
         composeTestRule.waitUntilExactlyOneExists(isDialog())
         screenshot("add_task_light")
     }
