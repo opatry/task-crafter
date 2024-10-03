@@ -23,7 +23,9 @@
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,6 +44,7 @@ class StoreScreenshotTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+//    val composeTestRule = createComposeRule()
 
     @get:Rule
     val screenshotOnFailureRule = ScreenshotOnFailureRule()
@@ -59,7 +62,26 @@ class StoreScreenshotTest {
 
     @Test
     fun playstoreScreenshotSequence() = runTest {
-        composeTestRule.waitUntilAtLeastOneExists(hasText("Toto", substring = true, ignoreCase = true))
+        // How to switch dark/light theme programmatically
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        // FIXME not enough for Activity theme (status bar & navigation bar)
+//        composeTestRule.setContent {
+//            var darkMode by remember { mutableStateOf(false) }
+//            TaskfolioTheme(darkMode) {
+//                Surface {
+//                    val userViewModel = koinViewModel<UserViewModel>()
+//                    val tasksViewModel = koinViewModel<TaskListsViewModel>()
+//                    TasksApp(AboutApp(
+//                        "Tasksfolio",
+//                        "1.0.0.1",
+//                        { "{\"libraries\": [], \"licenses\": []" }
+//                    ), userViewModel, tasksViewModel)
+//                }
+//            }
+//        }
+
+
+        composeTestRule.waitUntilAtLeastOneExists(hasText("My Tasks", substring = true, ignoreCase = true))
 //        composeTestRule.waitUntil {
 //            composeTestRule.onNodeWithText("My Tasks").isDisplayed()
 //        }
@@ -69,16 +91,18 @@ class StoreScreenshotTest {
 //        composeTestRule.onNodeWithText("Add task list…").performClick()
 //        composeTestRule.onNodeWithText("Create").performClick()
         screenshot("tasks_list_light")
-
-        val boolll = composeTestRule.onNodeWithText("Toto", substring = true, ignoreCase = true).isDisplayed()
+        val boolll = composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).isDisplayed()
         println("boolll=$boolll")
-        composeTestRule.onNodeWithText("Toto", substring = true, ignoreCase = true).assertExists()
-        composeTestRule.onNodeWithText("Toto", substring = true, ignoreCase = true).assertIsDisplayed()
-        composeTestRule.onNodeWithText("Toto", substring = true, ignoreCase = true).performClick()
+        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).assertExists()
+        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("My Tasks", substring = true, ignoreCase = true).performClick()
         screenshot("my_tasks_light")
 
+
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag("ADD_TASK_FAB"))
         composeTestRule.onNodeWithTag("ADD_TASK_FAB").performClick()
         composeTestRule.waitForIdle()
+        composeTestRule.waitUntilExactlyOneExists(isDialog())
         screenshot("add_task_light")
     }
 }
