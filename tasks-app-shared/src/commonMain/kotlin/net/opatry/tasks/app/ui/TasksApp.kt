@@ -34,6 +34,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -94,65 +95,67 @@ fun TasksApp(aboutApp: AboutApp, userViewModel: UserViewModel, tasksViewModel: T
     var newTaskListDefaultTitle by remember { mutableStateOf("") }
     var showNewTaskListDialog by remember { mutableStateOf(false) }
 
-    NavigationSuiteScaffold(modifier = Modifier.padding(top = 16.dp), navigationSuiteItems = {
-        AppTasksScreen.entries.forEach { screen ->
-            // hide unsupported screens for now
-            if (screen == AppTasksScreen.Calendar) return@forEach
-            if (screen == AppTasksScreen.Search) return@forEach
-            item(
-                selected = selectedScreen == screen,
-                onClick = { selectedScreen = screen },
-                label = { Text(stringResource(screen.labelRes)) },
-                icon = {
-                    Icon(screen.icon, screen.contentDescription?.let { stringResource(it) })
-                },
-                alwaysShowLabel = false,
-            )
-        }
-    }) {
-        Column {
-            when (selectedScreen) {
-                AppTasksScreen.Tasks -> {
-                    Card(
-                        Modifier.padding(16.dp),
-                        shape = MaterialTheme.shapes.extraLarge,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                stringResource(Res.string.app_name),
-                                Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 16.dp),
-                                style = MaterialTheme.typography.titleMedium
+    Scaffold { innerPadding ->
+        NavigationSuiteScaffold(modifier = Modifier.padding(innerPadding), navigationSuiteItems = {
+            AppTasksScreen.entries.forEach { screen ->
+                // hide unsupported screens for now
+                if (screen == AppTasksScreen.Calendar) return@forEach
+                if (screen == AppTasksScreen.Search) return@forEach
+                item(
+                    selected = selectedScreen == screen,
+                    onClick = { selectedScreen = screen },
+                    label = { Text(stringResource(screen.labelRes)) },
+                    icon = {
+                        Icon(screen.icon, screen.contentDescription?.let { stringResource(it) })
+                    },
+                    alwaysShowLabel = false,
+                )
+            }
+        }) {
+            Column {
+                when (selectedScreen) {
+                    AppTasksScreen.Tasks -> {
+                        Card(
+                            Modifier.padding(16.dp),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    stringResource(Res.string.app_name),
+                                    Modifier
+                                        .weight(1f)
+                                        .padding(horizontal = 16.dp),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                ProfileIcon(userViewModel)
+                            }
+                        }
+
+                        TaskListsMasterDetail(tasksViewModel) { title ->
+                            newTaskListDefaultTitle = title
+                            showNewTaskListDialog = true
+                        }
+
+                        if (showNewTaskListDialog) {
+                            EditTextDialog(
+                                onDismissRequest = { showNewTaskListDialog = false },
+                                validateLabel = "Create",
+                                onValidate = { title ->
+                                    showNewTaskListDialog = false
+                                    tasksViewModel.createTaskList(title)
+                                },
+                                dialogTitle = "New task list",
+                                initialText = newTaskListDefaultTitle,
+                                allowBlank = false
                             )
-                            ProfileIcon(userViewModel)
                         }
                     }
 
-                    TaskListsMasterDetail(tasksViewModel) { title ->
-                        newTaskListDefaultTitle = title
-                        showNewTaskListDialog = true
-                    }
-
-                    if (showNewTaskListDialog) {
-                        EditTextDialog(
-                            onDismissRequest = { showNewTaskListDialog = false },
-                            validateLabel = "Create",
-                            onValidate = { title ->
-                                showNewTaskListDialog = false
-                                tasksViewModel.createTaskList(title)
-                            },
-                            dialogTitle = "New task list",
-                            initialText = newTaskListDefaultTitle,
-                            allowBlank = false
-                        )
-                    }
+                    AppTasksScreen.Calendar -> MissingScreen(stringResource(AppTasksScreen.Calendar.labelRes), LucideIcons.Calendar)
+                    AppTasksScreen.Search -> MissingScreen(stringResource(AppTasksScreen.Search.labelRes), LucideIcons.Search)
+                    AppTasksScreen.About -> AboutScreen(aboutApp)
                 }
-
-                AppTasksScreen.Calendar -> MissingScreen(stringResource(AppTasksScreen.Calendar.labelRes), LucideIcons.Calendar)
-                AppTasksScreen.Search -> MissingScreen(stringResource(AppTasksScreen.Search.labelRes), LucideIcons.Search)
-                AppTasksScreen.About -> AboutScreen(aboutApp)
             }
         }
     }

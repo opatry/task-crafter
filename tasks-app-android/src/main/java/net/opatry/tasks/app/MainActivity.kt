@@ -24,6 +24,7 @@ package net.opatry.tasks.app
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +45,8 @@ import org.koin.compose.viewmodel.koinViewModel
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
 
         setContent {
             val userViewModel = koinViewModel<UserViewModel>()
