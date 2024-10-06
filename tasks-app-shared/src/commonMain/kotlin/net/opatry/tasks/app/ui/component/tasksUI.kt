@@ -125,6 +125,20 @@ import net.opatry.tasks.resources.task_lists_screen_empty_list_desc
 import net.opatry.tasks.resources.task_lists_screen_empty_list_title
 import org.jetbrains.compose.resources.stringResource
 
+object TasksAppTestTags
+
+val TasksAppTestTags.COMPLETED_TASKS_TOGGLE
+    get() = "COMPLETED_TASKS_TOGGLE"
+
+val TasksAppTestTags.ADD_TASK_FAB
+    get() = "ADD_TASK_FAB"
+
+val TasksAppTestTags.TASK_TITLE_FIELD
+    get() = "TASK_TITLE_FIELD"
+
+val TasksAppTestTags.TASK_NOTES_FIELD
+    get() = "TASK_NOTES_FIELD"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListDetail(
@@ -204,7 +218,7 @@ fun TaskListDetail(
         // FIXME should be driven by the NavigationRail
         floatingActionButton = {
             // FIXME hides bottom of screen
-            FloatingActionButton(onClick = { showNewTaskSheet = true }, Modifier.testTag("ADD_TASK_FAB")) {
+            FloatingActionButton(onClick = { showNewTaskSheet = true }, Modifier.testTag(TasksAppTestTags.ADD_TASK_FAB)) {
                 Icon(LucideIcons.Plus, null)
             }
         }
@@ -357,7 +371,9 @@ fun TaskListDetail(
                 OutlinedTextField(
                     newTitle,
                     onValueChange = { newTitle = it },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TasksAppTestTags.TASK_TITLE_FIELD),
                     label = { Text("Title") },
                     maxLines = 1,
                     supportingText = {
@@ -375,7 +391,9 @@ fun TaskListDetail(
                 OutlinedTextField(
                     newNotes,
                     onValueChange = { newNotes = it },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TasksAppTestTags.TASK_NOTES_FIELD),
                     label = { Text("Notes") },
                     leadingIcon = { Icon(LucideIcons.NotepadText, null) },
                     singleLine = false,
@@ -587,6 +605,7 @@ fun TasksColumn(
                         ) {
                             Text(
                                 "Completed (${completedCount})",
+                                Modifier.testTag(TasksAppTestTags.COMPLETED_TASKS_TOGGLE),
                                 style = MaterialTheme.typography.titleSmall
                             )
                         }

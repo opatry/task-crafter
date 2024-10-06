@@ -22,6 +22,7 @@
 
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -31,11 +32,16 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import kotlinx.coroutines.test.runTest
 import net.opatry.tasks.app.MainActivity
 import net.opatry.tasks.app.R
+import net.opatry.tasks.app.ui.component.COMPLETED_TASKS_TOGGLE
+import net.opatry.tasks.app.ui.component.TASK_NOTES_FIELD
+import net.opatry.tasks.app.ui.component.TASK_TITLE_FIELD
+import net.opatry.tasks.app.ui.component.TasksAppTestTags
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -53,7 +59,7 @@ class StoreScreenshotTest {
     private val targetContext: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private fun screenshot(name: String) {
+    private fun takeScreenshot(name: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val outputDir = File(instrumentation.targetContext.cacheDir, "store_screenshots").also(File::mkdirs)
         val outputFile = File(outputDir, "$name.png")
@@ -64,46 +70,108 @@ class StoreScreenshotTest {
             .takeScreenshot(outputFile)
     }
 
+    private fun pressBack() {
+        // FIXME how to "press back" with ComposeTestRule (without Espresso)
+//        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack()
+        composeTestRule.activity.onBackPressed()
+    }
+
+    /**
+     * This test should be executed with the `demo` flavor which stub content for store screenshots.
+     */
     @Test
-    fun playstoreScreenshotSequence() = runTest {
-        // How to switch dark/light theme programmatically
-//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        // FIXME not enough for Activity theme (status bar & navigation bar)
-//        composeTestRule.setContent {
-//            var darkMode by remember { mutableStateOf(false) }
-//            TaskfolioTheme(darkMode) {
-//                Surface {
-//                    val userViewModel = koinViewModel<UserViewModel>()
-//                    val tasksViewModel = koinViewModel<TaskListsViewModel>()
-//                    TasksApp(AboutApp(
-//                        "Tasksfolio",
-//                        "1.0.0.1",
-//                        { "{\"libraries\": [], \"licenses\": []" }
-//                    ), userViewModel, tasksViewModel)
-//                }
-//            }
-//        }
+    fun storeScreenshotSequence() = runTest {
+        composeTestRule.waitForIdle()
+        takeScreenshot("initial_screen")
 
-//        if (composeTestRule.onNodeWithText("Skip").isDisplayed()) {
-//            composeTestRule.onNodeWithText("Skip").performClick()
-//        }
-//        composeTestRule.onNodeWithText("Add task list…").performClick()
-//        composeTestRule.onNodeWithText("Create").performClick()
+        val defaultTaskTitle = targetContext.getString(R.string.demo_task_list_default)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(defaultTaskTitle))
+        composeTestRule.onNodeWithText(defaultTaskTitle).assertIsDisplayed()
 
-        screenshot("start")
-        val taskTitle = targetContext.getString(R.string.demo_task_list_default)
-        composeTestRule.waitUntilAtLeastOneExists(hasText(taskTitle))
-        screenshot("tasks_list_light")
-        composeTestRule.onNodeWithText(taskTitle, substring = true, ignoreCase = true)
+        val homeTaskTitle = targetContext.getString(R.string.demo_task_list_home)
+        composeTestRule.onNodeWithText(homeTaskTitle).assertIsDisplayed()
+
+        val groceriesTaskTitle = targetContext.getString(R.string.demo_task_list_groceries)
+        composeTestRule.onNodeWithText(groceriesTaskTitle).assertIsDisplayed()
+
+        val workTaskTitle = targetContext.getString(R.string.demo_task_list_work)
+        composeTestRule.onNodeWithText(workTaskTitle).assertIsDisplayed()
+
+        val initialNightMode = composeTestRule.activity.delegate.localNightMode
+        composeTestRule.activity.delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
+
+        takeScreenshot("tasks_list_light")
+
+        composeTestRule.onNodeWithText(defaultTaskTitle, substring = true, ignoreCase = true)
             .assertIsDisplayed()
             .performClick()
-        screenshot("my_tasks_light")
+        takeScreenshot("my_tasks_light")
 
         composeTestRule.waitUntilExactlyOneExists(hasTestTag("ADD_TASK_FAB"))
         composeTestRule.onNodeWithTag("ADD_TASK_FAB")
             .assertIsDisplayed()
             .performClick()
         composeTestRule.waitUntilExactlyOneExists(isDialog())
-        screenshot("add_task_light")
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.TASK_TITLE_FIELD))
+        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_TITLE_FIELD)
+            .performTextInput("Wash the car 🧽")
+        composeTestRule.waitForIdle()
+        // FIXME doesn't work
+        // dismiss keyboard
+        pressBack()
+
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.TASK_NOTES_FIELD))
+        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_NOTES_FIELD)
+            .performTextInput("Keys are in the drawer")
+        // FIXME doesn't work
+        // dismiss keyboard
+        pressBack()
+        composeTestRule.waitForIdle()
+        takeScreenshot("add_task_light")
+
+        // dismiss task editor sheet
+//        pressBack()
+        composeTestRule.onNodeWithText("Cancel", substring = true, ignoreCase = true)
+            .assertIsDisplayed()
+            .performClick()
+        // go back
+        pressBack()
+
+        composeTestRule.onNodeWithText(groceriesTaskTitle, substring = true, ignoreCase = true)
+            .assertIsDisplayed()
+            .performClick()
+        val groceriesTask1Title = targetContext.getString(R.string.demo_task_list_groceries_task1)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(groceriesTask1Title))
+        composeTestRule.onNodeWithTag(TasksAppTestTags.COMPLETED_TASKS_TOGGLE)
+            .assertIsDisplayed()
+            .performClick()
+        val groceriesTask3Title = targetContext.getString(R.string.demo_task_list_groceries_task3)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(groceriesTask3Title))
+        takeScreenshot("groceries_light")
+
+        pressBack()
+
+        composeTestRule.onNodeWithText(workTaskTitle, substring = true, ignoreCase = true)
+            .assertIsDisplayed()
+            .performClick()
+        val workTask1Title = targetContext.getString(R.string.demo_task_list_work_task1)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(workTask1Title))
+        takeScreenshot("work_light")
+
+        pressBack()
+
+        composeTestRule.onNodeWithText(homeTaskTitle, substring = true, ignoreCase = true)
+            .assertIsDisplayed()
+            .performClick()
+        val homeTask1Title = targetContext.getString(R.string.demo_task_list_home_task1)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(homeTask1Title))
+        takeScreenshot("home_task_light")
+
+        // FIXME Must be called from main thread
+        composeTestRule.activity.delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        // TODO + wait activity is resumed
+        composeTestRule.waitForIdle() // ? enough?
+        takeScreenshot("home_task_dark")
+        composeTestRule.activity.delegate.localNightMode = initialNightMode
     }
 }
