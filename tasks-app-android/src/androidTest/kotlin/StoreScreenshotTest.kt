@@ -46,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
+
 @OptIn(ExperimentalTestApi::class)
 class StoreScreenshotTest {
 
@@ -80,13 +81,25 @@ class StoreScreenshotTest {
         UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack()
     }
 
+    private fun switchToNightMode(nightMode: Int) {
+        composeTestRule.activity.runOnUiThread {
+            composeTestRule.activity.delegate.localNightMode = nightMode
+        }
+        composeTestRule.activityRule.scenario.recreate()
+        composeTestRule.waitForIdle()
+    }
+
     /**
      * This test should be executed with the `demo` flavor which stub content for store screenshots.
      */
     @Test
     fun storeScreenshotSequence() = runTest {
+        val initialNightMode = composeTestRule.activity.delegate.localNightMode
+
         composeTestRule.waitForIdle()
         takeScreenshot("initial_screen")
+
+        switchToNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         val defaultTaskTitle = targetContext.getString(R.string.demo_task_list_default)
         composeTestRule.waitUntilAtLeastOneExists(hasText(defaultTaskTitle))
@@ -101,9 +114,6 @@ class StoreScreenshotTest {
         val workTaskTitle = targetContext.getString(R.string.demo_task_list_work)
         composeTestRule.onNodeWithText(workTaskTitle).assertIsDisplayed()
 
-        val initialNightMode = composeTestRule.activity.delegate.localNightMode
-        composeTestRule.activity.delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
-
         takeScreenshot("tasks_list_light")
 
         composeTestRule.onNodeWithText(defaultTaskTitle)
@@ -111,6 +121,7 @@ class StoreScreenshotTest {
             .performClick()
         val defaultTask1Title = targetContext.getString(R.string.demo_task_list_default_task1)
         composeTestRule.waitUntilAtLeastOneExists(hasText(defaultTask1Title))
+        // FIXME unreliable, need to wait for something else?
         takeScreenshot("my_tasks_light")
 
         composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.ADD_TASK_FAB))
@@ -193,11 +204,9 @@ class StoreScreenshotTest {
         composeTestRule.waitUntilAtLeastOneExists(hasText(homeTask1Title))
         takeScreenshot("home_task_light")
 
-        // FIXME Must be called from main thread
-        composeTestRule.activity.delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-        // TODO + wait activity is resumed
-        composeTestRule.waitForIdle() // ? enough?
+        switchToNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        composeTestRule.waitUntilAtLeastOneExists(hasText(homeTask1Title))
         takeScreenshot("home_task_dark")
-        composeTestRule.activity.delegate.localNightMode = initialNightMode
+        switchToNightMode(initialNightMode)
     }
 }
