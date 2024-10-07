@@ -127,7 +127,7 @@ fun sortTasks(tasks: List<TaskEntity>): List<Pair<TaskEntity, Int>> {
 
     // Step 3: Sort the child tasks by position
     tree.forEach { (_, children) ->
-        children.sortBy { it.position }
+        children.sortBy(TaskEntity::position)
     }
 
     // Step 4: Recursive function to traverse tasks and assign indentation levels
