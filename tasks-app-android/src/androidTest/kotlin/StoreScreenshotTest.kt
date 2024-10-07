@@ -23,6 +23,7 @@
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -32,13 +33,16 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import kotlinx.coroutines.test.runTest
 import net.opatry.tasks.app.MainActivity
 import net.opatry.tasks.app.R
+import net.opatry.tasks.app.ui.component.ADD_TASK_FAB
 import net.opatry.tasks.app.ui.component.COMPLETED_TASKS_TOGGLE
+import net.opatry.tasks.app.ui.component.TASK_EDITOR_SHEET
 import net.opatry.tasks.app.ui.component.TASK_NOTES_FIELD
 import net.opatry.tasks.app.ui.component.TASK_TITLE_FIELD
 import net.opatry.tasks.app.ui.component.TasksAppTestTags
@@ -107,8 +111,8 @@ class StoreScreenshotTest {
             .performClick()
         takeScreenshot("my_tasks_light")
 
-        composeTestRule.waitUntilExactlyOneExists(hasTestTag("ADD_TASK_FAB"))
-        composeTestRule.onNodeWithTag("ADD_TASK_FAB")
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.ADD_TASK_FAB))
+        composeTestRule.onNodeWithTag(TasksAppTestTags.ADD_TASK_FAB)
             .assertIsDisplayed()
             .performClick()
         composeTestRule.waitUntilExactlyOneExists(isDialog())
@@ -118,17 +122,25 @@ class StoreScreenshotTest {
         composeTestRule.waitForIdle()
         // FIXME doesn't work
         // dismiss keyboard
-        pressBack()
+//        pressBack()
+        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_TITLE_FIELD)
+            .performSemanticsAction(SemanticsActions.Dismiss)
 
         composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.TASK_NOTES_FIELD))
         composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_NOTES_FIELD)
             .performTextInput("Keys are in the drawer")
+
         // FIXME doesn't work
         // dismiss keyboard
-        pressBack()
+//        pressBack()
+        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_NOTES_FIELD)
+            .performSemanticsAction(SemanticsActions.Dismiss)
         composeTestRule.waitForIdle()
         takeScreenshot("add_task_light")
 
+        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_EDITOR_SHEET)
+            .performSemanticsAction(SemanticsActions.Dismiss)
+        composeTestRule.waitForIdle()
         // dismiss task editor sheet
 //        pressBack()
         composeTestRule.onNodeWithText("Cancel", substring = true, ignoreCase = true)

@@ -139,6 +139,9 @@ val TasksAppTestTags.TASK_TITLE_FIELD
 val TasksAppTestTags.TASK_NOTES_FIELD
     get() = "TASK_NOTES_FIELD"
 
+val TasksAppTestTags.TASK_EDITOR_SHEET
+    get() = "TASK_EDITOR_SHEET"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListDetail(
@@ -337,6 +340,7 @@ fun TaskListDetail(
         val task = taskOfInterest
         ModalBottomSheet(
             sheetState = taskEditorSheetState,
+            modifier = Modifier.testTag(TasksAppTestTags.TASK_EDITOR_SHEET),
             onDismissRequest = {
                 taskOfInterest = null
                 showEditTaskSheet = false
