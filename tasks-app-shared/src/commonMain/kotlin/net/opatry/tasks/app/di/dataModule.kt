@@ -30,8 +30,9 @@ import org.koin.dsl.module
 
 private fun getRoomDatabase(builder: RoomDatabase.Builder<TasksAppDatabase>): TasksAppDatabase = builder
     .setDriver(BundledSQLiteDriver())
-    .fallbackToDestructiveMigration(dropAllTables = true)
+//    .fallbackToDestructiveMigration(dropAllTables = true)
     .setQueryCoroutineContext(Dispatchers.IO)
+//    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
     .build()
 
 val dataModule = module {
