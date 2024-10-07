@@ -38,10 +38,9 @@ import androidx.test.uiautomator.UiDevice
 import kotlinx.coroutines.test.runTest
 import net.opatry.tasks.app.MainActivity
 import net.opatry.tasks.app.R
-import net.opatry.tasks.app.ui.component.ADD_TASK_FAB
-import net.opatry.tasks.app.ui.component.TASK_NOTES_FIELD
-import net.opatry.tasks.app.ui.component.TASK_TITLE_FIELD
-import net.opatry.tasks.app.ui.component.TasksAppTestTags
+import net.opatry.tasks.app.ui.component.TasksUITestTags.ADD_TASK_FAB
+import net.opatry.tasks.app.ui.component.TasksUITestTags.TASK_NOTES_FIELD
+import net.opatry.tasks.app.ui.component.TasksUITestTags.TASK_TITLE_FIELD
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -124,40 +123,40 @@ class StoreScreenshotTest {
         // FIXME unreliable, need to wait for something else?
         takeScreenshot("my_tasks_light")
 
-        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.ADD_TASK_FAB))
-        composeTestRule.onNodeWithTag(TasksAppTestTags.ADD_TASK_FAB)
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(ADD_TASK_FAB))
+        composeTestRule.onNodeWithTag(ADD_TASK_FAB)
             .assertIsDisplayed()
             .performClick()
         composeTestRule.waitUntilExactlyOneExists(isDialog())
 
-        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.TASK_TITLE_FIELD))
-        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_TITLE_FIELD)
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TASK_TITLE_FIELD))
+        composeTestRule.onNodeWithTag(TASK_TITLE_FIELD)
             .performTextInput("Wash the car 🧽")
         composeTestRule.waitForIdle()
         // FIXME doesn't work
         // dismiss keyboard
 //        pressBack()
         dismissKeyboard()
-//        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_TITLE_FIELD)
+//        composeTestRule.onNodeWithTag(TASK_TITLE_FIELD)
 //            .performSemanticsAction(SemanticsActions.Dismiss)
 
 //        TODO consider LocalSoftwareKeyboardController.current, possible in UI test without @Composable?
 
-        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TasksAppTestTags.TASK_NOTES_FIELD))
-        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_NOTES_FIELD)
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag(TASK_NOTES_FIELD))
+        composeTestRule.onNodeWithTag(TASK_NOTES_FIELD)
             .performTextInput("Keys are in the drawer")
 
         // FIXME doesn't work
         // dismiss keyboard
 //        pressBack()
         dismissKeyboard()
-//        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_NOTES_FIELD)
+//        composeTestRule.onNodeWithTag(TASK_NOTES_FIELD)
 //            .performSemanticsAction(SemanticsActions.Dismiss)
 
         composeTestRule.waitForIdle()
         takeScreenshot("add_task_light")
 
-//        composeTestRule.onNodeWithTag(TasksAppTestTags.TASK_EDITOR_SHEET)
+//        composeTestRule.onNodeWithTag(TASK_EDITOR_SHEET)
 //            .performSemanticsAction(SemanticsActions.Dismiss)
 //        composeTestRule.waitForIdle()
         // dismiss task editor sheet
@@ -175,8 +174,8 @@ class StoreScreenshotTest {
         val groceriesTask1Title = targetContext.getString(R.string.demo_task_list_groceries_task1)
         composeTestRule.waitUntilAtLeastOneExists(hasText(groceriesTask1Title))
         // FIXME doesn't work while WithText(Completed) does… why?
-//        composeTestRule.waitUntilAtLeastOneExists(hasTestTag(TasksAppTestTags.COMPLETED_TASKS_TOGGLE))
-//        composeTestRule.onNodeWithTag(TasksAppTestTags.COMPLETED_TASKS_TOGGLE)
+//        composeTestRule.waitUntilAtLeastOneExists(hasTestTag(COMPLETED_TASKS_TOGGLE))
+//        composeTestRule.onNodeWithTag(COMPLETED_TASKS_TOGGLE)
         composeTestRule.onNodeWithText("Completed", substring = true)
             .assertIsDisplayed()
             .performClick()

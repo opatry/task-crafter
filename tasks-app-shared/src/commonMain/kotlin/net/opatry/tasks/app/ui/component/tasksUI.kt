@@ -115,6 +115,11 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import net.opatry.tasks.app.ui.TaskListsViewModel
+import net.opatry.tasks.app.ui.component.TasksUITestTags.ADD_TASK_FAB
+import net.opatry.tasks.app.ui.component.TasksUITestTags.COMPLETED_TASKS_TOGGLE
+import net.opatry.tasks.app.ui.component.TasksUITestTags.TASK_EDITOR_SHEET
+import net.opatry.tasks.app.ui.component.TasksUITestTags.TASK_NOTES_FIELD
+import net.opatry.tasks.app.ui.component.TasksUITestTags.TASK_TITLE_FIELD
 import net.opatry.tasks.app.ui.model.DateRange
 import net.opatry.tasks.app.ui.model.TaskListUIModel
 import net.opatry.tasks.app.ui.model.TaskUIModel
@@ -125,22 +130,13 @@ import net.opatry.tasks.resources.task_lists_screen_empty_list_desc
 import net.opatry.tasks.resources.task_lists_screen_empty_list_title
 import org.jetbrains.compose.resources.stringResource
 
-object TasksAppTestTags
-
-val TasksAppTestTags.COMPLETED_TASKS_TOGGLE
-    get() = "COMPLETED_TASKS_TOGGLE"
-
-val TasksAppTestTags.ADD_TASK_FAB
-    get() = "ADD_TASK_FAB"
-
-val TasksAppTestTags.TASK_TITLE_FIELD
-    get() = "TASK_TITLE_FIELD"
-
-val TasksAppTestTags.TASK_NOTES_FIELD
-    get() = "TASK_NOTES_FIELD"
-
-val TasksAppTestTags.TASK_EDITOR_SHEET
-    get() = "TASK_EDITOR_SHEET"
+object TasksUITestTags {
+    const val COMPLETED_TASKS_TOGGLE = "COMPLETED_TASKS_TOGGLE"
+    const val ADD_TASK_FAB = "ADD_TASK_FAB"
+    const val TASK_TITLE_FIELD = "TASK_TITLE_FIELD"
+    const val TASK_NOTES_FIELD = "TASK_NOTES_FIELD"
+    const val TASK_EDITOR_SHEET = "TASK_EDITOR_SHEET"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -221,7 +217,7 @@ fun TaskListDetail(
         // FIXME should be driven by the NavigationRail
         floatingActionButton = {
             // FIXME hides bottom of screen
-            FloatingActionButton(onClick = { showNewTaskSheet = true }, Modifier.testTag(TasksAppTestTags.ADD_TASK_FAB)) {
+            FloatingActionButton(onClick = { showNewTaskSheet = true }, Modifier.testTag(ADD_TASK_FAB)) {
                 Icon(LucideIcons.Plus, null)
             }
         }
@@ -340,7 +336,7 @@ fun TaskListDetail(
         val task = taskOfInterest
         ModalBottomSheet(
             sheetState = taskEditorSheetState,
-            modifier = Modifier.testTag(TasksAppTestTags.TASK_EDITOR_SHEET),
+            modifier = Modifier.testTag(TASK_EDITOR_SHEET),
             onDismissRequest = {
                 taskOfInterest = null
                 showEditTaskSheet = false
@@ -377,7 +373,7 @@ fun TaskListDetail(
                     onValueChange = { newTitle = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag(TasksAppTestTags.TASK_TITLE_FIELD),
+                        .testTag(TASK_TITLE_FIELD),
                     label = { Text("Title") },
                     maxLines = 1,
                     supportingText = {
@@ -397,7 +393,7 @@ fun TaskListDetail(
                     onValueChange = { newNotes = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag(TasksAppTestTags.TASK_NOTES_FIELD),
+                        .testTag(TASK_NOTES_FIELD),
                     label = { Text("Notes") },
                     leadingIcon = { Icon(LucideIcons.NotepadText, null) },
                     singleLine = false,
@@ -609,7 +605,7 @@ fun TasksColumn(
                         ) {
                             Text(
                                 "Completed (${completedCount})",
-                                Modifier.testTag(TasksAppTestTags.COMPLETED_TASKS_TOGGLE),
+                                Modifier.testTag(COMPLETED_TASKS_TOGGLE),
                                 style = MaterialTheme.typography.titleSmall
                             )
                         }
