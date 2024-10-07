@@ -113,7 +113,7 @@ class StoreScreenshotTest {
         val workTaskTitle = targetContext.getString(R.string.demo_task_list_work)
         composeTestRule.onNodeWithText(workTaskTitle).assertIsDisplayed()
 
-        takeScreenshot("tasks_list_light")
+        takeScreenshot("task_lists_light")
 
         composeTestRule.onNodeWithText(defaultTaskTitle)
             .assertIsDisplayed()
@@ -201,11 +201,11 @@ class StoreScreenshotTest {
             .performClick()
         val homeTask1Title = targetContext.getString(R.string.demo_task_list_home_task1)
         composeTestRule.waitUntilAtLeastOneExists(hasText(homeTask1Title))
-        takeScreenshot("home_task_light")
+        takeScreenshot("home_light")
 
         switchToNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         composeTestRule.waitUntilAtLeastOneExists(hasText(homeTask1Title))
-        takeScreenshot("home_task_dark")
+        takeScreenshot("home_dark")
         switchToNightMode(initialNightMode)
     }
 }
